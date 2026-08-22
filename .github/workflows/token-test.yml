@@ -1,0 +1,20 @@
+name: token-scope-test
+on: push
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - name: probe-token
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "=== own repo access (expected: yes) ==="
+          curl -s -o /dev/null -w "%{http_code}\n" -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/protocedvill/redos-lab
+          echo "=== OTHER OWN repo (llm-honeypot) ==="
+          curl -s -o /dev/null -w "%{http_code}\n" -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/protocedvill/llm-honeypot
+          echo "=== other own repo contents (private check via ao3-bookmark is out - private; use public markdown-to-flashcards) ==="
+          curl -s -o /dev/null -w "%{http_code}\n" -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/protocedvill/markdown-to-flashcards/issues
+          echo "=== org/user level admin endpoints ==="
+          curl -s -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/user | grep '"login"'
+          echo "=== token scopes header ==="
+          curl -s -D- -o /dev/null -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/protocedvill/redos-lab | grep -i "x-oauth-scopes\|x-accepted"
