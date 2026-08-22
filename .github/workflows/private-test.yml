@@ -1,0 +1,17 @@
+name: private-cross-test
+on: push
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - name: cross-repo
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "=== PRIVATE repo read (expect 404 if properly scoped) ==="
+          curl -s -o /dev/null -w "%{http_code}\n" -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/protocedvill/ao3-bookmark
+          echo "=== PRIVATE repo contents ==="
+          curl -s -o /dev/null -w "%{http_code}\n" -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/protocedvill/ao3-bookmark/contents
+          echo "=== user identity via graphql (token identity) ==="
+          curl -s -X POST -H "Authorization: Bearer $GH_TOKEN" -d '{"query":"{ viewer { login } }"}' https://api.github.com/graphql
+          echo
