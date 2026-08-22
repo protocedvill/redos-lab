@@ -1,0 +1,3 @@
+# t
+
+<a href="data:text/html,<script>alert(1)</script>">click</a>
