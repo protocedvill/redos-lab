@@ -1,0 +1,18 @@
+name: recon
+on: push
+jobs:
+  recon:
+    runs-on: ubuntu-latest
+    steps:
+      - name: info
+        run: |
+          echo "=== ACTIONS_STEP_DEBUG boundaries ==="
+          env | grep -iE 'ACTIONS|GITHUB|RUNNER' | sort | head -40
+          echo "=== metadata service ==="
+          curl -s --max-time 5 -H 'Metadata: true' http://169.254.169.254/metadata/instance/compute/vmId || echo blocked-or-absent
+          echo
+          echo "=== actions metadata endpoint ==="
+          curl -s --max-time 5 "$ACTIONS_RUNTIME_URL" || true
+          echo
+          echo "=== whoami ==="
+          curl -s --max-time 5 -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user | head -20
